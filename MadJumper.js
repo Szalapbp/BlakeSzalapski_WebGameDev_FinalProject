@@ -84,6 +84,17 @@ function create(){
 
     previousY = player.y
 
+    gameOverText = this.add.text(
+        this.physics.world.bounds.width / 2,
+        highestY,
+        'GAME OVER',{
+            fontSize: '64px'
+        }
+
+    )
+    gameOverText.setVisible(false);
+    gameOverText.setOrigin(.5);
+
 };
 
 function playerBounce(player, platform){
@@ -159,6 +170,11 @@ if (player.y < currentMaxPlatformY - spacing) {
 }
 
 previousY = player.y;
+
+
+if(player.y >= highestY + 300){
+    gameOverText.setVisible(true);
+}
 }
 
 
