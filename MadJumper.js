@@ -22,7 +22,7 @@ const config ={
     physics:{
         default: "arcade",
         arcade: {
-            gravity:{y: 1000}
+            gravity:{y: 1000}//this is the gravity level I saw most fit for the game, it helps the movements stay quick and allows the game to be a bit more challenging
         }
     }
 };
@@ -64,7 +64,7 @@ function preload(){
 
 function create(){
 
-   
+   //player sprite
     player = this.physics.add.sprite(
         this.physics.world.bounds.width / 2,
         this.physics.world.bounds.height -45,
@@ -78,7 +78,7 @@ function create(){
         this.physics.world.bounds.height - 10,
         'platform'
     )
-
+//Explosion animation
     this.anims.create({
         key:'EggExplosion',
         frames: this.anims.generateFrameNumbers('blast'),
@@ -112,7 +112,7 @@ function create(){
     
 
     previousY = player.y
-
+//container for the game over text when the player loses
     gameOverText = this.add.text(
         config.width / 2,
         camera.scrollY,
@@ -120,7 +120,7 @@ function create(){
             fontSize: '64px'
         }
     )
-
+//text container for the level text
     platformCounterText = this.add.text(
         10,
         10, 
@@ -178,7 +178,7 @@ function addPlatform(x, y, width = 30){
     return platform;
 
 }
-
+//function that places new platforms every given amount of y distance
 function addNewPlatforms(){
     let currentY = lastPlatformY;
     while (currentY > worldTop){
@@ -198,7 +198,7 @@ function addNewPlatforms(){
     }
     lastPlatformY = currentY + spacing;
     }
-
+//function for the blueprint of the eggs, this is later used by the addNewEggs function to place them
 function addEgg(x, y){
     let hazard = hazards.create(x, y, 'egg');
     hazard.setSize(32,32);
@@ -207,7 +207,7 @@ function addEgg(x, y){
     hazard.setVisible(true);
     return hazard;
 }
-
+//function for the addition of new explosive eggs on the map, generated very similarly to how the platforms are generated only at verying y spacing as well
 function addNewEggs(){
     for(let i = 0; i < Phaser.Math.Between(1,3); i++){
     let currentY = lastPlatformY;
@@ -232,6 +232,7 @@ function extendWorldBounds() {
    addNewEggs.call(this);
 }
 
+//destroys the player and the egg on impact as well as freezes the players position and plays the eggexplosion animation. This then sends you to the game over screen
 function hazardCollision(player, hazard){
 let blast = this.add.sprite(hazard.x, hazard.y, 'blast').play('EggExplosion');
 blast.once('animationcomplete', () => blast.destroy());
@@ -253,11 +254,11 @@ gameOverText.setVisible(true);
 
 
 
-
+//surrounded this in the gameOver boolean so that it freezes the appropriate functions on game over.
 function update(){
 if(!gameOver){
     
-
+//initializing the velocity for pressing directional keys
 player.body.setVelocityX(0);
 if(cursors.right.isDown || keys.d.isDown){
     player.body.setVelocityX(200);
@@ -266,7 +267,7 @@ if(cursors.left.isDown || keys.a.isDown){
     player.body.setVelocityX(-200);
 }
 
-
+//tracks the player, whenever the player goes above the highestY variable that it set previously, the camera begins to move up again with the character. It will not move down.
  let targetCameraY = highestY - 400;
     camera.scrollY = targetCameraY;
 
@@ -278,6 +279,7 @@ if (player.y < camera.scrollY + config.height / 4 ) {
     extendWorldBounds.call(this);
 }
 
+//generates more platforms as the player moves up in the world.
 let currentMaxPlatformY = platforms.getChildren().reduce((max, platform) => Math.max(max, platform.y), 0);
 if (player.y < currentMaxPlatformY - spacing) {
     extendWorldBounds.call(this);
@@ -285,13 +287,15 @@ if (player.y < currentMaxPlatformY - spacing) {
 
 previousY = player.y;
 
+//counts the levels that the character has gone up based off of the spacing between the platforms vertically which is always the same.
+
 let level = Math.floor(config.height - highestY / spacing);
     if(platformCounter < level){
         platformCounter = level;
         platformCounterText.setText('levels: ' + (platformCounter - 636));
     }
 
-
+//game over upon player falling off of the screen. When the player falls off of the camera it sends you to game over and freezes the character.
 
 if(player.y >= highestY + 250){
     gameOver = true;
