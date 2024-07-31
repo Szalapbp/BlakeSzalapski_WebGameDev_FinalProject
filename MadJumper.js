@@ -4,6 +4,13 @@ let worldHeight = initialWorldHeight;
 let worldTop = 0;
 let highestY = 0;
 
+window.addEventListener('gamepadconnected', function(e){
+    console.log('Gamepad connected')
+})
+window.addEventListener('gamepaddisconnected', function(e){
+    console.log('Gamepad disconnected')
+})
+
 const config ={
     type: Phaser.AUTO,
     parent: 'game', 
@@ -257,6 +264,22 @@ gameOverText.setVisible(true);
 //surrounded this in the gameOver boolean so that it freezes the appropriate functions on game over.
 function update(){
 if(!gameOver){
+
+    const gamepads = navigator.getGamepads();
+    const gamepad = gamepads[0];
+
+    if(gamepad){
+        if(gamepad.buttons[4].pressed){
+            player.setVelocityX(-200);
+        }
+        else if(gamepad.buttons[5].pressed){
+            player.setVelocityX(200);
+            
+        }
+        else{
+            player.setVelocityX(0);
+        }
+    }
     
 //initializing the velocity for pressing directional keys
 player.body.setVelocityX(0);
