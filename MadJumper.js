@@ -50,6 +50,7 @@ function preload(){
     this.load.image('goose', 'Assets/Jump.png');
     this.load.image('egg', 'Assets/Egg.png');
     this.load.image('platform', 'Assets/Platform.png');
+    this.load.spritesheet('blast', 'Assets/EggBlast.png');
 };
 
 function create(){
@@ -59,6 +60,7 @@ function create(){
         'goose'
     );
 
+    //static platform that the player always spawns on
     startingPlatform = this.physics.add.staticSprite(
         this.physics.world.bounds.width / 2,
         this.physics.world.bounds.height - 10,
@@ -75,9 +77,12 @@ function create(){
     cursors = this.input.keyboard.createCursorKeys();
     keys.a = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     keys.d = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+
+    //collision for player and the different platforms
     this.physics.add.collider(player, startingPlatform, playerBounce, null, this); 
     this.physics.add.collider(player, platforms, playerBounce, null, this);
 
+    //Camera that follows the players highest point
     camera = this.cameras.main;
     camera.setBounds(0, 0, config.width, worldHeight);
     
@@ -97,10 +102,13 @@ function create(){
 
 };
 
+//makes the player bounce off of the platforms at a set velocity
 function playerBounce(player, platform){
     player.setVelocityY(-550);
 }
 
+//creates the initial platforms which the player spawns on so that the player
+//does not spawn mid air.
 function createInitialPlatforms(){
     lastPlatformY = config.height - spacing;
     for(let i = 0; i < 3; i++){
@@ -111,6 +119,8 @@ function createInitialPlatforms(){
    
 }
 
+//creates a blueprint for the platforms that are randomly generated and placed
+//in a later function.
 function addPlatform(x, y, width = 30){
     let platform = platforms.create(x, y, 'platform');
     let scale = width / platform.width;
@@ -126,6 +136,7 @@ function addPlatform(x, y, width = 30){
 
 }
 
+//Extends the height of the world as the player progresses upward ont he platforms.
 function extendWorldBounds() {
    let extendAmount = config.height;
    worldTop -= extendAmount;
@@ -136,6 +147,8 @@ function extendWorldBounds() {
 
    addNewPlatforms.call(this);
 }
+
+
 
 function update(){
 if(!gameStarted){
@@ -172,12 +185,16 @@ if (player.y < currentMaxPlatformY - spacing) {
 previousY = player.y;
 
 
-if(player.y >= highestY + 300){
+if(player.y >= highestY + 250){
     gameOverText.setVisible(true);
+    player.setVelocityY(0);
 }
 }
 
 
+
+//Function called to randomly place the addPlatform function results at
+//specified distances from eachother as the player moves up.
 
 function addNewPlatforms(){
 let currentY = lastPlatformY;
